@@ -16,6 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
@@ -35,6 +38,19 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+
+            $file=$form->get('photo')->getData();
+            $fileName=md5(uniqid()).'.'.$file->guessExtension();
+            try{
+                $file->move($this->getParameter('images_directory'),$fileName);
+            }catch(FileException $e){
+    
+            }
+          
+            $user->setPhoto($fileName);
+
+
             // encode the plain password
             $user->setPassword(
             $userPasswordEncoder->encodePassword(

@@ -14,6 +14,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+
 class RegistrationFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -31,8 +34,9 @@ class RegistrationFormType extends AbstractType
             'attr' => ['class' => 'form-control' , 'placeholder' => 'cin',
                 ]
         ])
-        ->add('photo',TextType::class,[
-            'attr' => ['class' => 'form-control' , 'placeholder' => 'photo',
+        ->add('photo',FileType::class,[
+            'data_class' => null,
+            'attr' => ['class' => 'form-control' 
                 ]
         ])
         ->add('email',EmailType::class,[
