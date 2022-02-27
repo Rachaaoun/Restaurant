@@ -18,6 +18,15 @@ class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/approved", name="approved")
+     */
+    public function approved(): Response
+    {
+        return $this->render('home/approved.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
 
     /**
      * @Route("/admin", name="admin")

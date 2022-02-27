@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Data\SearchData;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -34,6 +35,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->_em->persist($user);
         $this->_em->flush();
+    }
+
+
+    /** 
+    *@return User[]
+    */
+    public function findSearch(SearchData $search ) : array
+    {
+        $queryBuilder = $this->createQueryBuilder('u');
+        
+      
+
+        if ($search->q) {
+            $queryBuilder->andWhere('u.prenom LIKE :prenom')
+                ->setParameter('prenom', '%'.$search->q.'%');
+        }
+
+      
+
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     // /**

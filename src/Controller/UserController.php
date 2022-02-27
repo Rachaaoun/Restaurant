@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Form\RegistrationFormType;
+use App\Data\SearchData;
+use App\Form\SearchForm;
 
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
@@ -23,10 +25,19 @@ class UserController extends AbstractController
     /**
      * @Route("/", name="user_index", methods={"GET"})
      */
-    public function index(UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository,Request $request): Response
     {
+             
+        $data = new SearchData();
+        $form = $this->createForm(SearchForm::class, $data);
+        $form->handleRequest($request);
+
+        $users= $userRepository->findSearch($data);
+       
+
         return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $users,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -100,5 +111,24 @@ class UserController extends AbstractController
         }
 
         return $this->redirectToRoute('user_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @Route("/{id}/approve", name="user_approve", methods={"GET", "POST"})
+     */
+    public function Approve(Request $request, User $user, EntityManagerInterface $entityManager,UserRepository $userRepository): Response
+    {
+       
+        $user->setIsVerified(true);
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute('user_index', [], Response::HTTP_SEE_OTHER);
+        
+        return $this->render('user/index.html.twig', [
+     
+            'users' => $userRepository->findAll(),
+      
+        ]);
     }
 }

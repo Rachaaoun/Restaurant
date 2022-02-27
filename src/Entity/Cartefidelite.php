@@ -90,5 +90,8 @@ class Cartefidelite
         return $this;
     }
 
+    public function __toString(){
+        return $this->num;
+    }
  
 }
