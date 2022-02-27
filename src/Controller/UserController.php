@@ -16,12 +16,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
+
 
 /**
  * @Route("/user")
  */
 class UserController extends AbstractController
 {
+    const ATTRIBUTES_TO_SERIALIZE =['id','nom','prenom','email','password','photo','cin'];
+
+
     /**
      * @Route("/", name="user_index", methods={"GET"})
      */
@@ -40,6 +50,7 @@ class UserController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    
 
     /**
      * @Route("/new", name="user_new", methods={"GET", "POST"})
@@ -131,4 +142,51 @@ class UserController extends AbstractController
       
         ]);
     }
+
+    /**
+     * @Route("/ajouter/utilisateur" , name="utilisateur_ajouter" ,  methods={"GET", "POST"}, requirements={"id":"\d+"})
+     */
+    public function ajouter(Request $request,SerializerInterface $serializer)
+    {
+      
+        $user = new User();
+        $nom=$request->query->get('nom');
+        $prenom=$request->query->get('prenom');
+        $password=$request->query->get('password');
+        $photo=$request->query->get('photo');
+        $email=$request->query->get('email');
+        $cin=$request->query->get('cin');
+        $em=$this->getDoctrine()->getManager();
+        $user->setPrenom($prenom);
+        $user->setNom($nom);
+        $user->setCin($cin);
+        $user->setEmail($email);
+        $user->setIsVerified(true);
+        $user->setPassword($password);
+        $user->setPhoto($photo);
+        $em->persist($user);
+        $em->flush();
+        $serializer=new Serializer([new ObjectNormalizer()]);
+        $formatted=$serializer->normalize($user);
+        return new JsonResponse($formatted);
+    }
+
+    /**
+     * @Route("/utilisateur/list")
+     * @param UserRepository $repo
+     */
+    public function getList(UserRepository $repo,SerializerInterface $serializer):Response{
+     
+                $users=$repo->findAll();
+                $json=$serializer->serialize($users,'json', ['groups' => ['user']]);
+        
+        
+                return $this->json(['user'=>$users],Response::HTTP_OK,[],[
+                    'attributes'=>self::ATTRIBUTES_TO_SERIALIZE
+                ]);
+        
+            }
+        
+
+   
 }
