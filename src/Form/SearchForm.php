@@ -25,6 +25,7 @@ class SearchForm extends AbstractType
                 'data_class' => SearchData::class,
                 'method'     => 'GET',
                 'csrf_protection' => false,
+                'user'=>null
              
 
         ]);
@@ -45,7 +46,14 @@ class SearchForm extends AbstractType
             'label' => false,
             'required' => false,
             'attr' => [
-                'placeholder' => 'Rechercher'
+                'placeholder' => 'Nom'
+            ]
+        ])
+        ->add('p', TextType::class, [
+            'label' => false,
+            'required' => false,
+            'attr' => [
+                'placeholder' => 'Prenom'
             ]
         ])
 

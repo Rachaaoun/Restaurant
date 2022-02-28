@@ -12,20 +12,11 @@ class SearchData
     public $q;
 
     /**
-     * @var Products[]
+     * @var string
      */
-    public $products = [];
+    public $p;
 
-    /**
-     * @var null|integer
-     */
-    public $max;
-
-     /**
-     * @var null|integer
-     */
-    public $min;
-
+  
 
 
 
