@@ -1,4 +1,10 @@
 {
+    "captcha-com/captcha": {
+        "version": "4.2.5"
+    },
+    "captcha-com/symfony-captcha-bundle": {
+        "version": "4.2.12"
+    },
     "doctrine/annotations": {
         "version": "1.13",
         "recipe": {
@@ -409,9 +415,6 @@
             "./tests/bootstrap.php"
         ]
     },
-    "symfony/polyfill-intl-grapheme": {
-        "version": "v1.24.0"
-    },
     "symfony/polyfill-intl-icu": {
         "version": "v1.24.0"
     },
@@ -504,9 +507,6 @@
     "symfony/stopwatch": {
         "version": "v4.4.37"
     },
-    "symfony/string": {
-        "version": "v5.4.3"
-    },
     "symfony/translation": {
         "version": "4.4",
         "recipe": {
@@ -587,6 +587,18 @@
     },
     "symfony/yaml": {
         "version": "v4.4.37"
+    },
+    "symfonycasts/reset-password-bundle": {
+        "version": "1.13",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.0",
+            "ref": "97c1627c0384534997ae1047b93be517ca16de43"
+        },
+        "files": [
+            "./config/packages/reset_password.yaml"
+        ]
     },
     "symfonycasts/verify-email-bundle": {
         "version": "v1.8.0"
