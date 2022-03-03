@@ -84,6 +84,11 @@ class User implements UserInterface
 
     protected $captchaCode;
 
+    /**
+     * @ORM\Column(type="string", length=5, nullable=true)
+     */
+    private $code;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -241,6 +246,18 @@ class User implements UserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

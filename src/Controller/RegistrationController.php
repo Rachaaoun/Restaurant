@@ -32,7 +32,7 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="app_register")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $userPasswordEncoder, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, \Swift_Mailer $mailer, UserPasswordEncoderInterface $userPasswordEncoder, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -70,24 +70,40 @@ class RegistrationController extends AbstractController
             $entityManager->persist($cartefidelite);
             $entityManager->flush();
             $user->setCarte($cartefidelite);
+
+            $code=random_int(1000,99999);
+
+            $user->setCode($code);
             $entityManager->persist($user);
             $entityManager->flush();
 
             // generate a signed url and email it to the user
-            // $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-            //     (new TemplatedEmail())
-            //         ->from(new Address('ghailene.boughzala@esprit.tn', 'Ghaylene'))
-            //         ->to($user->getEmail())
-            //         ->subject('Please Confirm your Email')
-            //         ->htmlTemplate('registration/confirmation_email.html.twig')
-            // );
+            //  $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            //      (new TemplatedEmail())
+            //          ->from(new Address('racha.aoun@esprit.tn', 'Ghaylene'))
+            //          ->to('racha.aoun@esprit.tn')
+            //          ->subject('Please Confirm your Email')
+            //          ->htmlTemplate('registration/confirmation_email.html.twig')
+            //  );
             // do anything else you need here, like send an email
-
-            return $this->redirectToRoute('app_login');
+                 $message = (new \Swift_Message('Hello Email'))
+        ->setFrom('racha.aoun@esprit.tn')
+        ->setTo($form->get('email')->getData())
+        ->setBody(
+            $this->renderView(
+                // templates/hello/email.txt.twig
+                'user/email.txt.twig',
+                ['name' => 'racha' , 'code'=>$code]
+            )
+        )
+    ;
+    $mailer->send($message);
+            return $this->redirectToRoute('app_confirm',['id'=>$user->getId()]);
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
+
         ]);
     }
 
