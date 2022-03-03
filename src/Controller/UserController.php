@@ -31,6 +31,8 @@ class UserController extends AbstractController
 {
     const ATTRIBUTES_TO_SERIALIZE =['id','nom','prenom','email','password','photo','cin'];
 
+
+
     /**
      * @Route("/profile", name="profile",  methods={"GET", "POST"})
      */
@@ -137,7 +139,6 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            
             return $this->redirectToRoute('user_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -223,7 +224,6 @@ class UserController extends AbstractController
         
             }
         
- 
 
    
 }

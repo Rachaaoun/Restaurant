@@ -8,6 +8,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Captcha\Bundle\CaptchaBundle\Validator\Constraints as CaptchaAssert;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -72,7 +74,7 @@ class User implements UserInterface
     private $photo;
 
     /**
-     * @ORM\OneToOne(targetEntity=Cartefidelite::class, cascade={"persist", "remove"} )
+     * @ORM\OneToOne(targetEntity=Cartefidelite::class, cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=true)
      */
     private $carte;
@@ -82,21 +84,27 @@ class User implements UserInterface
      */
     private $isVerified = false;
 
+   /**
+   * @CaptchaAssert\ValidCaptcha(
+   *      message = "CAPTCHA validation failed, try again."
+   * )
+   */
     protected $captchaCode;
 
+    public function getCaptchaCode()
+    {
+      return $this->captchaCode;
+    }
+  
+    public function setCaptchaCode($captchaCode)
+    {
+      $this->captchaCode = $captchaCode;
+    }
     public function getId(): ?int
     {
         return $this->id;
     }
-    public function getCaptchaCode()
-    {
-        return $this->captchaCode;
-    }
 
-    public function setCaptchaCode($captchaCode)
-    {
-         $this->$captchaCode=$captchaCode;
-    }
     public function getEmail(): ?string
     {
         return $this->email;
@@ -141,7 +149,7 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
