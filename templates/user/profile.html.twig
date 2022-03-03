@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block body %}
+
+    <h1>Edit User</h1>
+<p> Email : </p> <p>{{ app.user.email }}</p>
+    {{ include('user/_form.html.twig', {'button_label': 'edit profile'}) }}
+
+
+{% endblock %}

@@ -72,7 +72,7 @@ class User implements UserInterface
     private $photo;
 
     /**
-     * @ORM\OneToOne(targetEntity=Cartefidelite::class, cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Cartefidelite::class, cascade={"persist", "remove"} )
      * @ORM\JoinColumn(nullable=true)
      */
     private $carte;
@@ -131,7 +131,7 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function getPassword(): string
+    public function getPassword()
     {
         return $this->password;
     }
