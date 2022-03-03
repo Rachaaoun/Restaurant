@@ -82,11 +82,21 @@ class User implements UserInterface
      */
     private $isVerified = false;
 
+    protected $captchaCode;
+
     public function getId(): ?int
     {
         return $this->id;
     }
+    public function getCaptchaCode()
+    {
+        return $this->captchaCode;
+    }
 
+    public function setCaptchaCode($captchaCode)
+    {
+         $this->$captchaCode=$captchaCode;
+    }
     public function getEmail(): ?string
     {
         return $this->email;
