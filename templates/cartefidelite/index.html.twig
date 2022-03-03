@@ -1,0 +1,41 @@
+{% extends 'baseadmin.html.twig' %}
+
+{% block title %}Cartefidelite index{% endblock %}
+
+{% block body %}
+    <h1>Cartefidelite index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Num</th>
+                <th>Nbpts</th>
+                <th>Periodevalidation</th>
+                <th>Dateexpiration</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cartefidelite in cartefidelites %}
+            <tr>
+                <td>{{ cartefidelite.id }}</td>
+                <td>{{ cartefidelite.num }}</td>
+                <td>{{ cartefidelite.nbpts }}</td>
+                <td>{{ cartefidelite.periodevalidation }}</td>
+                <td>{{ cartefidelite.dateexpiration ? cartefidelite.dateexpiration|date('Y-m-d') : '' }}</td>
+                <td>
+                    <a href="{{ path('cartefidelite_show', {'id': cartefidelite.id}) }}">show</a>
+                    <a href="{{ path('cartefidelite_edit', {'id': cartefidelite.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('cartefidelite_new') }}">Create new</a>
+{% endblock %}

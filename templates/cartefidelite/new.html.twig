@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Cartefidelite{% endblock %}
+
+{% block body %}
+
+
+
+    <h1>Create new Cartefidelite</h1>
+
+    {{ include('cartefidelite/_form.html.twig') }}
+
+    <a href="{{ path('cartefidelite_index') }}">back to list</a>
+{% endblock %}
