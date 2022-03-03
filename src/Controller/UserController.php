@@ -31,6 +31,43 @@ class UserController extends AbstractController
 {
     const ATTRIBUTES_TO_SERIALIZE =['id','nom','prenom','email','password','photo','cin'];
 
+    
+    /**
+     * @Route("/profile", name="profile",  methods={"GET", "POST"})
+     */
+    public function profile(Request $request,  EntityManagerInterface $entityManager,UserPasswordEncoderInterface $userPasswordEncoder): Response
+    {
+        $user=$this->getUser();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file=$form->get('photo')->getData();
+            $fileName=md5(uniqid()).'.'.$file->guessExtension();
+            try{
+                $file->move($this->getParameter('images_directory'),$fileName);
+            }catch(FileException $e){
+    
+            }
+          
+            $user->setPhoto($fileName);
+            $user->setPassword(
+                $userPasswordEncoder->encodePassword(
+                        $user,
+                        $form->get('password')->getData()
+                    )
+                );
+            $entityManager->flush();
+
+        }
+
+        return $this->render('user/profile.html.twig', [
+            'user' => $user,
+            'form' => $form->createView(),
+        ]);
+    }
+
+
 
     /**
      * @Route("/", name="user_index", methods={"GET"})
