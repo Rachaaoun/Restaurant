@@ -16,14 +16,14 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
-
+use \Twilio\Rest\Client;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
-
+    private $twilio;
     public function __construct(EmailVerifier $emailVerifier)
     {
         $this->emailVerifier = $emailVerifier;
@@ -77,27 +77,32 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
-            //  $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-            //      (new TemplatedEmail())
-            //          ->from(new Address('racha.aoun@esprit.tn', 'Ghaylene'))
-            //          ->to('racha.aoun@esprit.tn')
-            //          ->subject('Please Confirm your Email')
-            //          ->htmlTemplate('registration/confirmation_email.html.twig')
-            //  );
-            // do anything else you need here, like send an email
                  $message = (new \Swift_Message('Hello Email'))
-        ->setFrom('racha.aoun@esprit.tn')
-        ->setTo($form->get('email')->getData())
-        ->setBody(
-            $this->renderView(
-                // templates/hello/email.txt.twig
-                'user/email.txt.twig',
-                ['name' => 'racha' , 'code'=>$code]
-            )
-        )
-    ;
-    $mailer->send($message);
+                ->setFrom('racha.aoun@esprit.tn')
+                ->setTo($form->get('email')->getData())
+                ->setBody(
+                    $this->renderView(
+                        // templates/hello/email.txt.twig
+                        'user/email.txt.twig',
+                        ['name' => 'racha' , 'code'=>$code]
+                    )
+                )
+                 ;
+            $mailer->send($message);
+            $sid = "ACcb357d4a35b4d0fddf30a204405908cb"; // Your Account SID from www.twilio.com/console
+            $token = "cb3211fa23870408880dbd187ad73291"; // Your Auth Token from www.twilio.com/console
+            //cb3211fa23870408880dbd187ad73291
+            $client = new Client($sid, $token);
+            
+             $message = $client->messages 
+             ->create("+21655904764", // to 
+                      array(  
+                          "messagingServiceSid" => "MG6906411a9eaa484b6a13b6707b84f124",      
+                          "body" => "your account is created you can log in " 
+                      ) 
+             ); 
+            print($message->sid);
+
             return $this->redirectToRoute('app_confirm',['id'=>$user->getId()]);
         }
 

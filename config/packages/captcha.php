@@ -2,7 +2,7 @@
 if(! class_exists('CaptchaConfiguration')) {return;}
 
 return [
-    'ExampleCaptchaUserRegistration'=>
+    'ExampleCaptchaUserRegistration' =>
     [
         'UserInputID'=>'captchaCode',
         'ImageWidth' =>250,
