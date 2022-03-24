@@ -8,7 +8,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Captcha\Bundle\CaptchaBundle\Validator\Constraints as CaptchaAssert;
+//use Captcha\Bundle\CaptchaBundle\Validator\Constraints as CaptchaAssert;
 
 
 /**
@@ -84,11 +84,7 @@ class User implements UserInterface
      */
     private $isVerified = false;
 
-   /**
-   * @CaptchaAssert\ValidCaptcha(
-   *      message = "CAPTCHA validation failed, try again."
-   * )
-   */
+
     protected $captchaCode;
 
     public function getCaptchaCode()

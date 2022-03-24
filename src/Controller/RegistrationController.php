@@ -17,9 +17,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -127,6 +130,45 @@ class RegistrationController extends AbstractController
         return $this->redirectToRoute('app_register');
     }
 
+    /**
+     * @Route("/signup/utilisateur" , name="utilisateur_register" ,  methods={"GET", "POST"})
+     */
+    public function ajouter(Request $request,SerializerInterface $serializer)
+    {
+      
+        $user = new User();
+        $nom=$request->query->get('nom');
+        $prenom=$request->query->get('prenom');
+        $password=$request->query->get('password');
+        $photo=$request->query->get('photo');
+        $email=$request->query->get('email');
+        $cin=$request->query->get('cin');
+        $em=$this->getDoctrine()->getManager();
+        $user->setPrenom($prenom);
+        $user->setNom($nom);
+        $user->setCin($cin);
+        $user->setEmail($email);
+        $user->setIsVerified(true);
+        $user->setPassword($password);
+        $user->setPhoto($photo);
+
+        $cartefidelite = new Cartefidelite();
+        $num=random_int(11111111,99999999);
+            $time = new \DateTime ('+3 year');
+            $cartefidelite->setNum((String) $num);
+            $cartefidelite->setNbpts(0);
+            $cartefidelite->setPeriodevalidation("5mois");
+            $cartefidelite->setDateexpiration($time);
+            $em->persist($cartefidelite);
+           
+            $user->setCarte($cartefidelite);
+            $em->persist($user);
+       
+        $em->flush();
+        $serializer=new Serializer([new ObjectNormalizer()]);
+        $formatted=$serializer->normalize($user);
+        return new JsonResponse($formatted);
+    }
 
 
 }
