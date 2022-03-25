@@ -8,8 +8,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-//use Captcha\Bundle\CaptchaBundle\Validator\Constraints as CaptchaAssert;
-
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -84,23 +82,26 @@ class User implements UserInterface
      */
     private $isVerified = false;
 
-
     protected $captchaCode;
 
-    public function getCaptchaCode()
-    {
-      return $this->captchaCode;
-    }
-  
-    public function setCaptchaCode($captchaCode)
-    {
-      $this->captchaCode = $captchaCode;
-    }
+    /**
+     * @ORM\Column(type="string", length=5, nullable=true)
+     */
+    private $code;
+
     public function getId(): ?int
     {
         return $this->id;
     }
+    public function getCaptchaCode()
+    {
+        return $this->captchaCode;
+    }
 
+    public function setCaptchaCode($captchaCode)
+    {
+         $this->$captchaCode=$captchaCode;
+    }
     public function getEmail(): ?string
     {
         return $this->email;
@@ -245,6 +246,18 @@ class User implements UserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

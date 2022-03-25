@@ -16,20 +16,14 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
-
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use \Twilio\Rest\Client;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
-
+    private $twilio;
     public function __construct(EmailVerifier $emailVerifier)
     {
         $this->emailVerifier = $emailVerifier;
@@ -38,25 +32,14 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="app_register")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $userPasswordEncoder, EntityManagerInterface $entityManager,MailerInterface $mailer): Response
+    public function register(Request $request, \Swift_Mailer $mailer, UserPasswordEncoderInterface $userPasswordEncoder, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $email = (new Email())
-            ->from('racha.aoun@esprit.tn')
-            ->to('racha.aoun@hotmail.com')
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
-            ->html('<p>See Twig integration for better HTML integration!</p>');
 
-             $mailer->send($email);
 
             $file=$form->get('photo')->getData();
             $fileName=md5(uniqid()).'.'.$file->guessExtension();
@@ -87,24 +70,45 @@ class RegistrationController extends AbstractController
             $entityManager->persist($cartefidelite);
             $entityManager->flush();
             $user->setCarte($cartefidelite);
+
+            $code=random_int(1000,99999);
+
+            $user->setCode($code);
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
-            // $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-            //     (new TemplatedEmail())
-            //         ->from(new Address('ghailene.boughzala@esprit.tn', 'Ghaylene'))
-            //         ->to($user->getEmail())
-            //         ->subject('Please Confirm your Email')
-            //         ->htmlTemplate('registration/confirmation_email.html.twig')
-            // );
-            // do anything else you need here, like send an email
+                 $message = (new \Swift_Message('Hello Email'))
+                ->setFrom('racha.aoun@esprit.tn')
+                ->setTo($form->get('email')->getData())
+                ->setBody(
+                    $this->renderView(
+                        // templates/hello/email.txt.twig
+                        'user/email.txt.twig',
+                        ['name' => 'racha' , 'code'=>$code]
+                    )
+                )
+                 ;
+            $mailer->send($message);
+            $sid = "ACcb357d4a35b4d0fddf30a204405908cb"; // Your Account SID from www.twilio.com/console
+            $token = "cb3211fa23870408880dbd187ad73291"; // Your Auth Token from www.twilio.com/console
+            //cb3211fa23870408880dbd187ad73291
+            $client = new Client($sid, $token);
+            
+             $message = $client->messages 
+             ->create("+21655904764", // to 
+                      array(  
+                          "messagingServiceSid" => "MG6906411a9eaa484b6a13b6707b84f124",      
+                          "body" => "your account is created you can log in " 
+                      ) 
+             ); 
+            print($message->sid);
 
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_confirm',['id'=>$user->getId()]);
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
+
         ]);
     }
 
@@ -130,45 +134,6 @@ class RegistrationController extends AbstractController
         return $this->redirectToRoute('app_register');
     }
 
-    /**
-     * @Route("/signup/utilisateur" , name="utilisateur_register" ,  methods={"GET", "POST"})
-     */
-    public function ajouter(Request $request,SerializerInterface $serializer)
-    {
-      
-        $user = new User();
-        $nom=$request->query->get('nom');
-        $prenom=$request->query->get('prenom');
-        $password=$request->query->get('password');
-        $photo=$request->query->get('photo');
-        $email=$request->query->get('email');
-        $cin=$request->query->get('cin');
-        $em=$this->getDoctrine()->getManager();
-        $user->setPrenom($prenom);
-        $user->setNom($nom);
-        $user->setCin($cin);
-        $user->setEmail($email);
-        $user->setIsVerified(true);
-        $user->setPassword($password);
-        $user->setPhoto($photo);
-
-        $cartefidelite = new Cartefidelite();
-        $num=random_int(11111111,99999999);
-            $time = new \DateTime ('+3 year');
-            $cartefidelite->setNum((String) $num);
-            $cartefidelite->setNbpts(0);
-            $cartefidelite->setPeriodevalidation("5mois");
-            $cartefidelite->setDateexpiration($time);
-            $em->persist($cartefidelite);
-           
-            $user->setCarte($cartefidelite);
-            $em->persist($user);
-       
-        $em->flush();
-        $serializer=new Serializer([new ObjectNormalizer()]);
-        $formatted=$serializer->normalize($user);
-        return new JsonResponse($formatted);
-    }
 
 
 }

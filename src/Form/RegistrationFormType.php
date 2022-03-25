@@ -16,9 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-//use Captcha\Bundle\CaptchaBundle\Form\Type\CaptchaType;
-
-//use Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidCaptcha;
+use Captcha\Bundle\CaptchaBundle\Form\Type\CaptchaType;
+use Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidCaptcha;
 
 class RegistrationFormType extends AbstractType
 {
@@ -65,14 +64,14 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
-            // ->add('captchaCode',CaptchaType::class,[
-            //     'captchaConfig' => 'ExampleCaptchaUserRegistration',
-            //     'constraints' => new ValidCaptcha(
-            //         [
-            //             'message' =>'invalid captcha please try again'
-            //         ]
-            //     )
-            // ])
+            ->add('captchaCode',CaptchaType::class,[
+                'captchaConfig' => 'ExampleCaptchaUserRegistration',
+                'constraints' => new ValidCaptcha(
+                    [
+                        'message' =>'invalid captcha please try again'
+                    ]
+                )
+            ])
         ;
     }
 

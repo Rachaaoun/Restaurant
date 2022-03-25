@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Form\RegistrationFormType;
 use App\Data\SearchData;
-use App\Entity\Cartefidelite;
 use App\Form\SearchForm;
 
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -32,6 +31,7 @@ class UserController extends AbstractController
 {
     const ATTRIBUTES_TO_SERIALIZE =['id','nom','prenom','email','password','photo','cin'];
 
+    
     /**
      * @Route("/profile", name="profile",  methods={"GET", "POST"})
      */
@@ -66,6 +66,7 @@ class UserController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 
 
     /**
@@ -180,82 +181,12 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/ajouter/utilisateur" , name="utilisateur_ajouter" ,  methods={"GET", "POST"})
+     * @Route("/ajouter/utilisateur" , name="utilisateur_ajouter" ,  methods={"GET", "POST"}, requirements={"id":"\d+"})
      */
     public function ajouter(Request $request,SerializerInterface $serializer)
     {
       
         $user = new User();
-        $nom=$request->query->get('nom');
-        $prenom=$request->query->get('prenom');
-        $password=$request->query->get('password');
-        $photo=$request->query->get('photo');
-        $email=$request->query->get('email');
-        $cin=$request->query->get('cin');
-        $em=$this->getDoctrine()->getManager();
-        $user->setPrenom($prenom);
-        $user->setNom($nom);
-        $user->setCin($cin);
-        $user->setEmail($email);
-        $user->setIsVerified(true);
-        $user->setPassword($password);
-        $user->setPhoto($photo);
-
-        $cartefidelite = new Cartefidelite();
-        $num=random_int(11111111,99999999);
-            $time = new \DateTime ('+3 year');
-            $cartefidelite->setNum((String) $num);
-            $cartefidelite->setNbpts(0);
-            $cartefidelite->setPeriodevalidation("5mois");
-            $cartefidelite->setDateexpiration($time);
-            $em->persist($cartefidelite);
-           
-            $user->setCarte($cartefidelite);
-            $em->persist($user);
-       
-        $em->flush();
-        $serializer=new Serializer([new ObjectNormalizer()]);
-        $formatted=$serializer->normalize($user);
-        return new JsonResponse($formatted);
-    }
-
-    /**
-     * @Route("/utilisateur/list")
-     * @param UserRepository $repo
-     */
-    public function getList(UserRepository $repo,SerializerInterface $serializer):Response{
-     
-                $users=$repo->findAll();
-                $json=$serializer->serialize($users,'json', ['groups' => ['user']]);
-        
-        
-                return $this->json(['user'=>$users],Response::HTTP_OK,[],[
-                    'attributes'=>self::ATTRIBUTES_TO_SERIALIZE
-                ]);
-        
-    }
-    
-    /**
-     * @Route("/detail/{id}",name="user_detail")
-     */
-    public function userProfile(UserRepository $repo,$id,SerializerInterface $serializer){
-        $user=$repo->findById($id);
-      
-        $json=$serializer->serialize($user,'json', ['groups' => ['user']]);
-
-
-        return $this->json(['user'=>$user],Response::HTTP_OK,[],[
-            'attributes'=>self::ATTRIBUTES_TO_SERIALIZE
-        ]);
-
-    }
-
-    /**
-     * @Route("/edit/profile/{id}" , name="utilisateur_modifier" ,  methods={"GET", "POST"}, requirements={"id":"\d+"})
-     */
-    public function editProfile(Request $request,SerializerInterface $serializer,$id,UserRepository $repo)
-    {
-        $user=$repo->findOneById($id);
         $nom=$request->query->get('nom');
         $prenom=$request->query->get('prenom');
         $password=$request->query->get('password');
@@ -278,25 +209,21 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/utilisateur/delete", name="supprimer_utilisateur")
+     * @Route("/utilisateur/list")
+     * @param UserRepository $repo
      */
-    public function supprimerUtilisateur(Request $request, UserRepository $repo): Response
-    {
+    public function getList(UserRepository $repo,SerializerInterface $serializer):Response{
+     
+                $users=$repo->findAll();
+                $json=$serializer->serialize($users,'json', ['groups' => ['user']]);
+        
+        
+                return $this->json(['user'=>$users],Response::HTTP_OK,[],[
+                    'attributes'=>self::ATTRIBUTES_TO_SERIALIZE
+                ]);
+        
+            }
+        
 
-        $id =$request->get("id");
-        $em=$this->getDoctrine()->getManager();
-
-     $d=   $repo->find($id);
-
-        if($d != null){
-            $em->remove($d);
-            $em->flush();
-            $serializer=new Serializer([new ObjectNormalizer()]);
-            $formatted=$serializer->normalize("utilsateur a eté supprimeé");
-            return new JsonResponse($formatted);
-        }
-
-       return  new JsonResponse("Id Invalide");
-    }
    
 }
